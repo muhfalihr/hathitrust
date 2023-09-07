@@ -145,7 +145,3 @@ def takeResults1(items, page):
         return unique(links), np
     else:
         return unique(links), np
-# items = soup('https://catalog.hathitrust.org/Search/Home?lookfor={0}&searchtype={1}&ft=ft&setft=true&page={2}'.format(
-#     'title', 'islam', '100'), user_agent())
-
-# takeResults1(items, '100')
