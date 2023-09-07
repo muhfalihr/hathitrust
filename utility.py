@@ -115,7 +115,7 @@ def dtddList(item, desc):
             'dt', 'g-col-lg-4 g-col-12') if dt.text == desc for dd in grid.find_all('dd', 'g-col-lg-8 g-col-12') for a in dd.find_all('a')]
 
 
-def takeResults1(items):
+def takeResults1(items, page):
     for item in items:
         try:
             links = ['http://catalog.hathitrust.org' + takehref['href'].replace('#viewability', '')
@@ -125,4 +125,16 @@ def takeResults1(items):
         except:
             links = items
 
-    return unique(links)
+        next_page = [hrp['data-prop-next-href'][-1]
+                     for hrp in item.find_all('hathi-results-pagination')]
+
+        if next_page == page-1:
+            return unique(links), ''
+        elif next_page != page-1:
+            return unique(links), next_page
+
+
+# items = soup('https://catalog.hathitrust.org/Search/Home?lookfor={0}&searchtype={1}&ft=ft&setft=true&page={2}'.format(
+#     'title', 'islam', '100'), user_agent())
+
+# takeResults1(items, '100')

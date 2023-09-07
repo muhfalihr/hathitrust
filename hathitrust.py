@@ -2,22 +2,23 @@ from utility import user_agent, options, soup, clearLast, clean, takeResults1
 from tools import Book
 
 
-def takeLink(option='', keyword=''):
+def takeLink(option='', keyword='', page='1'):
     '''option => ftaf = Full Text & All Fields, all, title, author, subject, isn, publisher, seriestitle'''
     try:
         if option == 'ftaf':
             link = f'https://babel.hathitrust.org/cgi/ls?q1={keyword}&field1=ocr&a=srchls&ft=ft&lmt=ft'
         elif option in options():
-            link = 'https://catalog.hathitrust.org/Search/Home?lookfor={0}&searchtype={1}&ft=ft&setft=true'.format(
-                keyword, option)
+            link = 'https://catalog.hathitrust.org/Search/Home?lookfor={0}&searchtype={1}&ft=ft&setft=true&page={2}'.format(
+                keyword, option, page)
 
         items = soup(link, user_agent())
 
-        links = takeResults1(items)
-        return links
+        links, pages = takeResults1(items, page)
+
+        return links, pages
 
     except:
-        return []
+        return None
 
 
 def crawling(url):
@@ -40,7 +41,6 @@ def crawling(url):
         tools = Book(grids1, grids, item)
 
         results = {
-            'status': 200,
             'title': title,
             'description': {
                 'main_author': tools.author(),
