@@ -115,6 +115,12 @@ def dtddList(item, desc):
             'dt', 'g-col-lg-4 g-col-12') if dt.text == desc for dd in grid.find_all('dd', 'g-col-lg-8 g-col-12') for a in dd.find_all('a')]
 
 
+def max_page(items):
+    max_page = [hrp['data-prop-max-pages']
+                for item in items for hrp in item.find_all('hathi-results-pagination')]
+    return max_page[0]
+
+
 def takeResults1(items, page):
     for item in items:
         try:
@@ -123,17 +129,22 @@ def takeResults1(items, page):
                      else takehref['href'].replace('#viewability', '')
                      for takehref in item.find_all('a', 'list-group-item list-group-item-action w-sm-50')]
         except:
-            links = items
+            links = ['']
 
-        next_page = [hrp['data-prop-next-href'][-1]
-                     for hrp in item.find_all('hathi-results-pagination')]
+        try:
+            np_list = [hrp['data-prop-next-href']
+                       for hrp in item.find_all('hathi-results-pagination')]
+            np = re.search(r'pagesize=100&page=(\d+)', np_list[0]).group(1)
 
-        if next_page == page-1:
-            return unique(links), ''
-        elif next_page != page-1:
-            return unique(links), next_page
+        except:
+            np = ''
 
-
+    if page == max_page(items):
+        return unique(links), np
+    elif page != max_page(items):
+        return unique(links), np
+    else:
+        return unique(links), np
 # items = soup('https://catalog.hathitrust.org/Search/Home?lookfor={0}&searchtype={1}&ft=ft&setft=true&page={2}'.format(
 #     'title', 'islam', '100'), user_agent())
 

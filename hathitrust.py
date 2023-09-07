@@ -1,24 +1,25 @@
-from utility import user_agent, options, soup, clearLast, clean, takeResults1
+from utility import user_agent, options, soup, clearLast, clean, takeResults1, max_page
 from tools import Book
+import json
 
 
-def takeLink(option='', keyword='', page='1'):
+def takeLink(page, option='', keyword=''):
     '''option => ftaf = Full Text & All Fields, all, title, author, subject, isn, publisher, seriestitle'''
     try:
         if option == 'ftaf':
             link = f'https://babel.hathitrust.org/cgi/ls?q1={keyword}&field1=ocr&a=srchls&ft=ft&lmt=ft'
         elif option in options():
-            link = 'https://catalog.hathitrust.org/Search/Home?lookfor={0}&searchtype={1}&ft=ft&setft=true&page={2}'.format(
+            link = 'https://catalog.hathitrust.org/Search/Home?lookfor={0}&searchtype={1}&ft=ft&setft=true&page={2}&pagesize=100&ft=ft&pagesize=100'.format(
                 keyword, option, page)
 
         items = soup(link, user_agent())
 
-        links, pages = takeResults1(items, page)
+        links, next_pages = takeResults1(items, page)
 
-        return links, pages
+        return links, next_pages
 
     except:
-        return None
+        return []
 
 
 def crawling(url):
@@ -55,3 +56,46 @@ def crawling(url):
             }
         }
         return results
+
+
+def saveData1(links, next_page, option, keyword):
+    results = []
+    fix_datas = {
+        'status': 200,
+        'data': results,
+        'next_page': next_page
+    }
+    count = 1
+    for url in links:
+        results.append(crawling(url=url))
+        datas = json.dumps(fix_datas, indent=4)
+
+        try:
+            with open(f'Result/hathitrust{option}{keyword}.json', 'w') as file:
+                file.write(datas)
+        except:
+            with open(f'Result/hathitrust{option}{keyword}.json', 'r+') as file:
+                file.write(datas)
+
+        print('Data {0}-Berhasil!'.format(count))
+        count += 1
+
+
+def saveData2(option, keyword):
+    results = []
+    fix_datas = {
+        'status': 400,
+        'data': results,
+        'next_page': ''
+    }
+
+    datas = json.dumps(fix_datas, indent=4)
+
+    try:
+        with open(f'Result/hathitrust{option}{keyword}.json', 'w') as file:
+            file.write(datas)
+    except:
+        with open(f'Result/hathitrust{option}{keyword}.json', 'r+') as file:
+            file.write(datas)
+
+    print('Data {0}-Berhasil!'.format(1))

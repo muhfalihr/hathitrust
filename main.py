@@ -1,4 +1,4 @@
-from hathitrust import takeLink, crawling
+from hathitrust import takeLink, saveData1, saveData2
 import json
 
 if __name__ == '__main__':
@@ -9,40 +9,7 @@ if __name__ == '__main__':
     page = input('Masukkan page : ')
 
     try:
-        links, pages = takeLink(option, keyword, page)
-    except TypeError:
-        pages = ''
-
-    status = 400 if pages == "" else 200
-
-    results = []
-    fix_datas = {
-        'status': status,
-        'data': results,
-        'next_page': pages
-    }
-    try:
-        count = 1
-        for url in links:
-            results.append(crawling(url=url))
-            datas = json.dumps(fix_datas, indent=4)
-
-            try:
-                with open(f'Result/hathitrust{option}{keyword}.json', 'w') as file:
-                    file.write(datas)
-            except:
-                with open(f'Result/hathitrust{option}{keyword}.json', 'r+') as file:
-                    file.write(datas)
-
-            print('Data {0}-Berhasil!'.format(count))
-            count += 1
-    except NameError:
-        datas = json.dumps(fix_datas, indent=4)
-
-        try:
-            with open(f'Result/hathitrust{option}{keyword}.json', 'w') as file:
-                file.write(datas)
-        except:
-            with open(f'Result/hathitrust{option}{keyword}.json', 'r+') as file:
-                file.write(datas)
-        print('Data {0}-Berhasil!'.format(count))
+        links, next_pages = takeLink(page, option, keyword)
+        saveData1(links, next_pages, option, keyword)
+    except ValueError:
+        saveData2(option, keyword)
