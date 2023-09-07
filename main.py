@@ -15,7 +15,12 @@ if __name__ == '__main__':
         results.append(crawling(url=url))
         datas = json.dumps(results, indent=4)
 
-        with open(f'Result/hathitrust{option}{keyword}.json', 'w') as file:
-            file.write(datas)
+        try:
+            with open(f'Result/hathitrust{option}{keyword}.json', 'w') as file:
+                file.write(datas)
+        except:
+            with open(f'Result/hathitrust{option}{keyword}.json', 'r+') as file:
+                file.write(datas)
+
         print('Data {0}-Berhasil!'.format(count))
         count += 1
